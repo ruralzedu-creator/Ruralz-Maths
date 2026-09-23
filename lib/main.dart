@@ -2,17 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 const supabaseUrl = String.fromEnvironment('SUPABASE_URL');
-const supabaseAnonKey = String.fromEnvironment('SUPABASE_ANON_KEY');
+const supabasePublishableKey = String.fromEnvironment('SUPABASE_ANON_KEY');
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  if (supabaseUrl.isNotEmpty && supabaseAnonKey.isNotEmpty) {
-    await Supabase.initialize(url: supabaseUrl, anonKey: supabaseAnonKey);
+  if (supabaseUrl.isNotEmpty && supabasePublishableKey.isNotEmpty) {
+    await Supabase.initialize(
+      url: supabaseUrl,
+      publishableKey: supabasePublishableKey,
+    );
   }
   runApp(const RuralzMathsApp());
 }
 
-bool get configured => supabaseUrl.isNotEmpty && supabaseAnonKey.isNotEmpty;
+bool get configured => supabaseUrl.isNotEmpty && supabasePublishableKey.isNotEmpty;
 SupabaseClient get db => Supabase.instance.client;
 
 class RuralzMathsApp extends StatelessWidget {
