@@ -1,151 +1,46 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-const defaultSupabaseUrl = 'https://bpyhfufefpjraefcovrw.supabase.co';
-const defaultSupabaseKey = 'sb_publishable_F1KtKcCl_MdJtrAMPLjiuA_uYxqKxmo';
-final envSupabaseUrl = const String.fromEnvironment('SUPABASE_URL');
-final envSupabaseKey = const String.fromEnvironment('SUPABASE_ANON_KEY');
-final supabaseUrl = envSupabaseUrl.isEmpty ? defaultSupabaseUrl : envSupabaseUrl;
-final supabaseKey = envSupabaseKey.isEmpty ? defaultSupabaseKey : envSupabaseKey;
-final supabase = Supabase.instance.client;
+const supabaseUrl = 'https://bpyhfufefpjraefcovrw.supabase.co';
+const supabaseKey = 'sb_publishable_F1KtKcCl_MdJtrAMPLjiuA_uYxqKxmo';
+const developerPhotoBase64 = '/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABcQERQRDhcUEhQaGBcbIjklIh8fIkYyNSk5UkhXVVFIUE5bZoNvW2F8Yk5QcptzfIeLkpSSWG2grJ+OqoOPko3/2wBDARgaGiIeIkMlJUONXlBejY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY3/wAARCABAADADASIAAhEBAxEB/8QAGgAAAgMBAQAAAAAAAAAAAAAAAwQCBQYAAf/EACsQAAIBAwMDBAEEAwAAAAAAAAECAwAEERIhMQVBURMiYXEyFEKBsRWR0f/EABcBAAMBAAAAAAAAAAAAAAAAAAABAgP/xAAaEQEBAQEAAwAAAAAAAAAAAAAAEQECIVFh/9oADAMBAAIRAxEAPwBnqsrpEACAjbHzVHqIJCE89uauuo2r3EwTdiBnAbG1I3FvAAqoxVgMMQOPujcSq5Wdn0qS2T2712JQQulSScc0w1m4DOrLgHsdz/FTjngjQpp0sOWP7v8AfeohgSQRemytlZxuMUKznkW/jkVVZ84Gdu2KeUNo9ZbV5IV/J/x/kVWyYLs6eSRtVDG5M4AIxnzgb1XT2iyM7BypPIxz90zLKkYBJ0nv80rJeFhpyCPNaRL30o/RKRYjZtztyfFES1jimwFUyMM4pZJiGGnc0d4J/wDJQyHdSMsRwMUt+HnkzrKj3oQD5FZfqlsttdMI8hGww+M9q085uA4CEMD2xVP16IkwOyhSQQaOhid5LrlyPx7UENmvEmRE4LEjcVFpdbEgBfqikJHdRpOV1YkQZGRtmml63BHCRJIHkB5Xis/DELy6kLZK87HFT/Txw3aopJVRrbPxSu1WSLuS8a5hjuEYa0YgqBjAPH9Ut1O5aazCtu+rIA+qrbe4lVyWcuD5NGMgcF+DxvU9dQRISe/Sdx5pq2iicN60ojjAO2fc31VYj6R8/NMtchYgFHuzzilmezjkSK01iKVmVv3FKG8EsIkeZSnqYClhjI5/5U/1MYZdQ1gHJHAPxXvUOpG/kTMehE4UHNVQTAJBwM57io65AMMMr/VFVgh3XBNczLj64qKH/9k=';
+
+final db = Supabase.instance.client;
+const green = Color(0xFF2E8B57);
+const paleGreen = Color(0xFFF1FAF3);
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Supabase.initialize(url: supabaseUrl, publishableKey: supabaseKey);
-  runApp(const RuralzMathsApp());
+  runApp(const RuralzApp());
 }
 
-class RuralzMathsApp extends StatelessWidget {
-  const RuralzMathsApp({super.key});
+class RuralzApp extends StatelessWidget {
+  const RuralzApp({super.key});
   @override
-  Widget build(BuildContext context) => MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: 'Ruralz Maths',
-        theme: ThemeData(
-          useMaterial3: true,
-          colorSchemeSeed: const Color(0xFF2E7D4F),
-          scaffoldBackgroundColor: const Color(0xFFF3FBF6),
-        ),
-        home: const SplashScreen(),
-      );
+  Widget build(BuildContext context) => MaterialApp(debugShowCheckedModeBanner: false, title: 'Ruralz - Maths', theme: ThemeData(useMaterial3: true, colorSchemeSeed: green, scaffoldBackgroundColor: paleGreen), home: const Splash());
 }
 
-class RuralzLogo extends StatelessWidget {
-  final double size;
-  const RuralzLogo({super.key, this.size = 120});
-  @override
-  Widget build(BuildContext context) => CustomPaint(
-        size: Size.square(size),
-        painter: _RuralzLogoPainter(),
-      );
-}
+Widget logo(double size) => Container(width: size, height: size, decoration: BoxDecoration(color: const Color(0xFFE5F4E8), borderRadius: BorderRadius.circular(size * .2)), child: CustomPaint(painter: LogoPainter()));
+Widget photo(double size) => ClipOval(child: Image.memory(base64Decode(developerPhotoBase64), width: size, height: size, fit: BoxFit.cover));
 
-class _RuralzLogoPainter extends CustomPainter {
+class LogoPainter extends CustomPainter {
   @override
-  void paint(Canvas canvas, Size size) {
-    final box = RRect.fromRectAndRadius(Offset.zero & size, Radius.circular(size.width * .2));
-    canvas.drawRRect(box, Paint()..color = const Color(0xFFE8F5E9));
-    canvas.drawCircle(Offset(size.width * .72, size.height * .22), size.width * .09, Paint()..color = const Color(0xFFF6B83F));
-    final hill = Path()..moveTo(0, size.height * .58)..quadraticBezierTo(size.width * .35, size.height * .25, size.width * .62, size.height * .5)..quadraticBezierTo(size.width * .85, size.height * .68, size.width, size.height * .56)..lineTo(size.width, size.height)..lineTo(0, size.height)..close();
-    canvas.drawPath(hill, Paint()..color = const Color(0xFF6DBD7A));
-    final ground = Path()..moveTo(0, size.height * .75)..quadraticBezierTo(size.width * .5, size.height * .48, size.width, size.height * .7)..lineTo(size.width, size.height)..lineTo(0, size.height)..close();
-    canvas.drawPath(ground, Paint()..color = const Color(0xFF2E7D4F));
-    final stem = Paint()..color = const Color(0xFF2E7D4F)..strokeWidth = size.width * .045..strokeCap = StrokeCap.round;
-    canvas.drawLine(Offset(size.width * .5, size.height * .72), Offset(size.width * .5, size.height * .43), stem);
-    canvas.drawOval(Rect.fromCenter(center: Offset(size.width * .41, size.height * .4), width: size.width * .28, height: size.height * .14), Paint()..color = const Color(0xFF2E7D4F));
-    canvas.drawOval(Rect.fromCenter(center: Offset(size.width * .59, size.height * .36), width: size.width * .28, height: size.height * .14), Paint()..color = const Color(0xFF2E7D4F));
-  }
+  void paint(Canvas c, Size s) { final p = Paint(); p.color = const Color(0xFFF6B83F); c.drawCircle(Offset(s.width*.72,s.height*.22),s.width*.09,p); p.color=const Color(0xFF6DBD7A); final h=Path()..moveTo(0,s.height*.58)..quadraticBezierTo(s.width*.4,s.height*.2,s.width*.7,s.height*.5)..quadraticBezierTo(s.width*.9,s.height*.65,s.width,s.height*.55)..lineTo(s.width,s.height)..lineTo(0,s.height)..close(); c.drawPath(h,p); p.color=green; final g=Path()..moveTo(0,s.height*.75)..quadraticBezierTo(s.width*.5,s.height*.48,s.width,s.height*.7)..lineTo(s.width,s.height)..lineTo(0,s.height)..close(); c.drawPath(g,p); p.strokeWidth=s.width*.05; c.drawLine(Offset(s.width*.5,s.height*.72),Offset(s.width*.5,s.height*.43),p); }
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
-class SplashScreen extends StatefulWidget {
-  const SplashScreen({super.key});
-  @override
-  State<SplashScreen> createState() => _SplashScreenState();
+class Splash extends StatefulWidget { const Splash({super.key}); @override State<Splash> createState()=>_SplashState(); }
+class _SplashState extends State<Splash> { @override void initState(){super.initState(); Future.delayed(const Duration(seconds:10),(){if(mounted)Navigator.pushReplacement(context,MaterialPageRoute(builder:(_)=>const Home()));});} @override Widget build(BuildContext c)=>Scaffold(body:Center(child:Column(mainAxisAlignment:MainAxisAlignment.center,children:[logo(150),const SizedBox(height:18),const Text('Ruralz - Maths',style:TextStyle(fontSize:30,fontWeight:FontWeight.bold)),const Text('Enriching Hopes',style:TextStyle(letterSpacing:4,color:Colors.black54)),const SizedBox(height:24),photo(118),const SizedBox(height:12),const Text('Developed by D. K. Chavan sir',style:TextStyle(fontWeight:FontWeight.bold)),const SizedBox(height:6),const Text('MHT-CET Mathematics Practice')]))); }
+
+class Home extends StatelessWidget { const Home({super.key}); @override Widget build(BuildContext c)=>Scaffold(appBar:AppBar(title:const Text('Ruralz - Maths'),actions:[Padding(padding:const EdgeInsets.only(right:12),child:logo(40))]),body:FutureBuilder<List<dynamic>>(future:db.from('topics').select('id,name,sort_order').order('sort_order'),builder:(c,s){if(s.connectionState!=ConnectionState.done)return const Center(child:CircularProgressIndicator(color:green));if(s.hasError)return ConnectionView(onRetry:()=>Navigator.pushReplacement(c,MaterialPageRoute(builder:(_)=>const Home())));final topics=s.data??[];return ListView(padding:const EdgeInsets.all(16),children:[Container(padding:const EdgeInsets.all(18),decoration:BoxDecoration(color:const Color(0xFFE2F4E7),borderRadius:BorderRadius.circular(22)),child:Row(children:[Expanded(child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:const[Text('MHT-CET Mathematics',style:TextStyle(fontSize:20,fontWeight:FontWeight.bold)),Text('Offline Test Series'),Text('20 Tests • 50 Questions • 90 Minutes')])),logo(76)])),const SizedBox(height:18),const Text('Topics',style:TextStyle(fontSize:21,fontWeight:FontWeight.bold)),const SizedBox(height:8),...topics.map((t)=>Card(child:ListTile(leading:CircleAvatar(backgroundColor:green,foregroundColor:Colors.white,child:Text('${t['sort_order']}')),title:Text('${t['name']}'),subtitle:const Text('20 Tests • 50 Questions'),trailing:const Icon(Icons.chevron_right),onTap:()=>Navigator.push(c,MaterialPageRoute(builder:(_)=>Tests(topicId:'${t['id']}',name:'${t['name']}'))))))]);}})); }
 }
 
-class _SplashScreenState extends State<SplashScreen> {
-  @override
-  void initState() {
-    super.initState();
-    Future.delayed(const Duration(seconds: 10), () {
-      if (mounted) Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const HomeScreen()));
-    });
-  }
+class ConnectionView extends StatelessWidget { final VoidCallback onRetry; const ConnectionView({super.key,required this.onRetry}); @override Widget build(BuildContext c)=>Center(child:Padding(padding:const EdgeInsets.all(28),child:Column(mainAxisAlignment:MainAxisAlignment.center,children:const[Icon(Icons.cloud_off,size:60,color:green),SizedBox(height:16),Text('Ruralz is temporarily offline',textAlign:TextAlign.center,style:TextStyle(fontSize:19,fontWeight:FontWeight.bold)),SizedBox(height:8),Text('Please check your internet connection and try again.',textAlign:TextAlign.center),SizedBox(height:18)]).withRetry(onRetry))); }
 
-  @override
-  Widget build(BuildContext context) => Scaffold(
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: const [
-              RuralzLogo(size: 160),
-              SizedBox(height: 18),
-              Text('Ruralz', style: TextStyle(fontSize: 42, fontWeight: FontWeight.bold)),
-              Text('Enriching Hopes', style: TextStyle(fontSize: 17, letterSpacing: 4, color: Colors.grey)),
-              SizedBox(height: 26),
-              CircleAvatar(radius: 45, backgroundColor: Color(0xFFDCEFE0), child: Icon(Icons.person, size: 48, color: Color(0xFF2E7D4F))),
-              SizedBox(height: 14),
-              Text('Developed by D. K. Chavan sir', style: TextStyle(fontWeight: FontWeight.w600)),
-              SizedBox(height: 8),
-              Text('MHT-CET Mathematics • Test Series'),
-            ],
-          ),
-        ),
-      );
-}
+extension RetryWidget on Column { Widget withRetry(VoidCallback retry)=>Column(mainAxisAlignment:mainAxisAlignment,crossAxisAlignment:crossAxisAlignment,children:[...children,FilledButton.icon(onPressed:retry,icon:const Icon(Icons.refresh),label:const Text('Retry'))]); }
 
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
-  @override
-  Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(title: const Text('Ruralz Maths')),
-        body: FutureBuilder<List<dynamic>>(
-          future: supabase.from('topics').select('id,name,sort_order').order('sort_order'),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState != ConnectionState.done) return const Center(child: CircularProgressIndicator());
-            if (snapshot.hasError) return _ErrorView(onRetry: () => Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const HomeScreen())));
-            final topics = snapshot.data ?? <dynamic>[];
-            return ListView(
-              padding: const EdgeInsets.all(16),
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(18),
-                  decoration: BoxDecoration(color: const Color(0xFFDCEFE0), borderRadius: BorderRadius.circular(22)),
-                  child: const Row(children: [RuralzLogo(size: 76), SizedBox(width: 14), Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text('MHT-CET Mathematics', style: TextStyle(fontSize: 19, fontWeight: FontWeight.bold)), Text('Practice • Learn • Improve'), Text('20 tests • 50 questions per test')]))]),
-                ),
-                const SizedBox(height: 18),
-                ...topics.asMap().entries.map((entry) {
-                  final topic = entry.value;
-                  return Card(child: ListTile(leading: CircleAvatar(backgroundColor: const Color(0xFF2E7D4F), foregroundColor: Colors.white, child: Text('${entry.key + 1}')), title: Text(topic['name'].toString()), subtitle: const Text('20 tests available'), trailing: const Icon(Icons.chevron_right), onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => TestListScreen(topicId: topic['id'].toString(), topicName: topic['name'].toString())))));
-                }),
-              ],
-            );
-          },
-        ),
-      );
-}
-
-class _ErrorView extends StatelessWidget {
-  final VoidCallback onRetry;
-  const _ErrorView({required this.onRetry});
-  @override
-  Widget build(BuildContext context) => Center(child: Padding(padding: const EdgeInsets.all(24), child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [const Icon(Icons.wifi_off, size: 56, color: Color(0xFF2E7D4F)), const SizedBox(height: 16), const Text('Unable to connect to Ruralz server', textAlign: TextAlign.center, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)), const SizedBox(height: 8), const Text('Check your internet connection and try again.', textAlign: TextAlign.center), const SizedBox(height: 18), FilledButton.icon(onPressed: onRetry, icon: const Icon(Icons.refresh), label: const Text('Retry'))])));
-}
-
-class TestListScreen extends StatelessWidget {
-  final String topicId;
-  final String topicName;
-  const TestListScreen({super.key, required this.topicId, required this.topicName});
-  @override
-  Widget build(BuildContext context) => Scaffold(appBar: AppBar(title: Text(topicName)), body: FutureBuilder<List<dynamic>>(future: supabase.from('tests').select('id,test_number,title,question_count,duration_minutes').eq('topic_id', topicId).order('test_number'), builder: (context, snapshot) { if (snapshot.connectionState != ConnectionState.done) return const Center(child: CircularProgressIndicator()); if (snapshot.hasError) return _ErrorView(onRetry: () => Navigator.pop(context)); final tests = snapshot.data ?? <dynamic>[]; return ListView.builder(padding: const EdgeInsets.all(16), itemCount: tests.length, itemBuilder: (context, index) { final test = tests[index]; final title = test['title']?.toString() ?? 'Test ${test['test_number']}'; return Card(child: ListTile(title: Text(title), subtitle: Text('${test['question_count']} questions • ${test['duration_minutes']} minutes'), trailing: const Icon(Icons.play_arrow), onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => QuestionScreen(testId: test['id'].toString(), title: title)))); }); }));
-}
-
-class QuestionScreen extends StatelessWidget {
-  final String testId;
-  final String title;
-  const QuestionScreen({super.key, required this.testId, required this.title});
-  @override
-  Widget build(BuildContext context) => Scaffold(appBar: AppBar(title: Text(title)), body: FutureBuilder<List<dynamic>>(future: supabase.from('questions').select('question_text,option_a,option_b,option_c,option_d,correct_option,explanation,sort_order').eq('test_id', testId).order('sort_order'), builder: (context, snapshot) { if (snapshot.connectionState != ConnectionState.done) return const Center(child: CircularProgressIndicator()); if (snapshot.hasError) return _ErrorView(onRetry: () => Navigator.pop(context)); final questions = snapshot.data ?? <dynamic>[]; return ListView.builder(padding: const EdgeInsets.all(16), itemCount: questions.length, itemBuilder: (context, index) { final q = questions[index]; return Card(margin: const EdgeInsets.only(bottom: 14), child: Padding(padding: const EdgeInsets.all(16), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text('Q${index + 1}. ${q['question_text']}', style: const TextStyle(fontWeight: FontWeight.bold)), const SizedBox(height: 10), Text('A. ${q['option_a']}'), Text('B. ${q['option_b']}'), Text('C. ${q['option_c']}'), Text('D. ${q['option_d']}'), const SizedBox(height: 10), Text('Answer: ${q['correct_option']}', style: const TextStyle(fontWeight: FontWeight.bold)), if (q['explanation'] != null) Text('Explanation: ${q['explanation']}')] ))); }); }));
+class Tests extends StatelessWidget { final String topicId,name; const Tests({super.key,required this.topicId,required this.name}); @override Widget build(BuildContext c)=>Scaffold(appBar:AppBar(title:Text(name)),body:FutureBuilder<List<dynamic>>(future:db.from('tests').select('id,test_number,title,question_count,duration_minutes').eq('topic_id',topicId).order('test_number'),builder:(c,s){if(s.connectionState!=ConnectionState.done)return const Center(child:CircularProgressIndicator());if(s.hasError)return ConnectionView(onRetry:()=>Navigator.pop(c));final tests=s.data??[];return ListView.builder(padding:const EdgeInsets.all(16),itemCount:tests.length,itemBuilder:(c,i){final t=tests[i];return Card(child:ListTile(title:Text('${t['title']??'Test ${t['test_number']}'}'),subtitle:Text('${t['question_count']} Questions • ${t['duration_minutes']} Minutes')));});})); }
 }
