@@ -10,7 +10,15 @@ set -euo pipefail
 
 mkdir -p database/export
 
-pg_dump "$SUPABASE_DB_URL" \
+# Prefer PostgreSQL 17 explicitly. Ubuntu may keep an older pg_dump first in PATH.
+if [[ -x /usr/lib/postgresql/17/bin/pg_dump ]]; then
+  PG_DUMP_BIN=/usr/lib/postgresql/17/bin/pg_dump
+else
+  PG_DUMP_BIN="$(command -v pg_dump)"
+fi
+
+"$PG_DUMP_BIN" --version
+"$PG_DUMP_BIN" "$SUPABASE_DB_URL" \
   --data-only \
   --inserts \
   --column-inserts \
