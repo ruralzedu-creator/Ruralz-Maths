@@ -8,8 +8,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Install PostgreSQL and SQLite tools
-        run: sudo apt-get update && sudo apt-get install -y postgresql-client sqlite3
+
+      - name: Install PostgreSQL 17 and SQLite tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y curl ca-certificates lsb-release sqlite3
+          sudo install -d /usr/share/postgresql-common/pgdg
+          sudo curl --fail --silent --show-error \
+            -o /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc \
+            https://www.postgresql.org/media/keys/ACCC4CF8.asc
+          echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" \
+            | sudo tee /etc/apt/sources.list.d/pgdg.list
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client-17
+          pg_dump --version
+
       - name: Export PostgreSQL data
         env:
           SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
@@ -17,12 +30,14 @@ jobs:
           test -n "$SUPABASE_DB_URL"
           chmod +x database/export_ruralz_maths_data.sh
           ./database/export_ruralz_maths_data.sh
+
       - name: Convert exported SQL to SQLite
         run: |
           mkdir -p database/export
           sqlite3 database/export/ruralz_maths.sqlite < database/ruralz_maths_sqlite_schema.sql
           python3 database/convert_postgres_dump_to_sqlite.py database/export/ruralz_maths_data.sql database/export/ruralz_maths.sqlite
           sqlite3 database/export/ruralz_maths.sqlite 'PRAGMA integrity_check;'
+
       - name: Upload SQL and SQLite artifacts
         uses: actions/upload-artifact@v4
         with:
