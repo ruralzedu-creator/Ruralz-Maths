@@ -70,19 +70,13 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   late Future<List<dynamic>> future;
-
   @override
   void initState() {
     super.initState();
     future = loadTopics();
   }
 
-  Future<List<dynamic>> loadTopics() async => await Supabase.instance.client
-      .from('topics')
-      .select('id,name,sort_order')
-      .order('sort_order')
-      .timeout(const Duration(seconds: 15));
-
+  Future<List<dynamic>> loadTopics() => Supabase.instance.client.from('topics').select('id,name,sort_order').order('sort_order').timeout(const Duration(seconds: 15));
   void retry() => setState(() => future = loadTopics());
 
   @override
@@ -98,10 +92,26 @@ class _HomeState extends State<Home> {
             return ListView(
               padding: const EdgeInsets.all(16),
               children: [
-                Container(padding: const EdgeInsets.all(18), decoration: BoxDecoration(color: const Color(0xFFE2F4E7), borderRadius: BorderRadius.circular(22)), child: const Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text('MHT-CET Mathematics', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)), Text('Online Test Series'), Text('20 Tests • 50 Questions • 90 Minutes')])),
+                Container(
+                  padding: const EdgeInsets.all(18),
+                  decoration: BoxDecoration(color: const Color(0xFFE2F4E7), borderRadius: BorderRadius.circular(22)),
+                  child: const Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Text('MHT-CET Mathematics', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                    Text('Online Test Series'),
+                    Text('20 Tests • 50 Questions • 90 Minutes'),
+                  ]),
+                ),
                 const SizedBox(height: 16),
                 const Text('Topics', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-                ...topics.map((topic) => Card(child: ListTile(leading: CircleAvatar(backgroundColor: green, foregroundColor: Colors.white, child: Text('${topic['sort_order']}')), title: Text('${topic['name']}'), subtitle: const Text('20 Tests • 50 Questions'), trailing: const Icon(Icons.chevron_right), onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => Tests(topicId: '${topic['id']}', name: '${topic['name']}'))))))),
+                ...topics.map((topic) => Card(
+                      child: ListTile(
+                        leading: CircleAvatar(backgroundColor: green, foregroundColor: Colors.white, child: Text('${topic['sort_order']}')),
+                        title: Text('${topic['name']}'),
+                        subtitle: const Text('20 Tests • 50 Questions'),
+                        trailing: const Icon(Icons.chevron_right),
+                        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => Tests(topicId: '${topic['id']}', name: '${topic['name']}'))),
+                      ),
+                    )),
               ],
             );
           },
@@ -125,13 +135,7 @@ class _TestsState extends State<Tests> {
     future = loadTests();
   }
 
-  Future<List<dynamic>> loadTests() async => await Supabase.instance.client
-      .from('tests')
-      .select('id,test_number,title,question_count,duration_minutes')
-      .eq('topic_id', widget.topicId)
-      .order('test_number')
-      .timeout(const Duration(seconds: 15));
-
+  Future<List<dynamic>> loadTests() => Supabase.instance.client.from('tests').select('id,test_number,title,question_count,duration_minutes').eq('topic_id', widget.topicId).order('test_number').timeout(const Duration(seconds: 15));
   void retry() => setState(() => future = loadTests());
 
   @override
