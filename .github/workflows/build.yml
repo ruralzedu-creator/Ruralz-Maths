@@ -12,12 +12,17 @@ jobs:
         with:
           flutter-version: '3.32.8'
           channel: stable
-      - run: flutter create --platforms=android --project-name ruralz_maths .
+      - run: flutter create --platforms=android,web --project-name ruralz_maths .
       - run: rm -rf test
       - run: flutter pub get
       - run: flutter analyze --no-fatal-infos
-      - run: flutter build apk --release --dart-define=SUPABASE_URL=${{ secrets.SUPABASE_URL }} --dart-define=SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }}
+      - run: flutter build apk --release
+      - run: flutter build web --release
       - uses: actions/upload-artifact@v4
         with:
           name: ruralz-maths-apk
           path: build/app/outputs/flutter-apk/app-release.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ruralz-maths-web
+          path: build/web/**
