@@ -179,6 +179,7 @@ class _QuizPageState extends State<QuizPage> {
   final Map<int, String> answers = {};
   Timer? timer;
   int remaining = 0, current = 0;
+  final DateTime startedAt = DateTime.now().toUtc();
   bool loading = true, submitted = false;
   String? error;
   int get correct => questions.where((q) => answers[q['id']] == q['correct_option']).length;
@@ -207,12 +208,28 @@ class _QuizPageState extends State<QuizPage> {
     final user = db.auth.currentUser;
     if (user != null) {
       try {
-        await db.from('attempts').insert({
-          'user_id': user.id, 'test_id': widget.test['id'], 'started_at': DateTime.now().toUtc().toIso8601String(),
-          'submitted_at': DateTime.now().toUtc().toIso8601String(), 'total_questions': questions.length,
+        final submittedAt = DateTime.now().toUtc();
+        final attempt = await db.from('attempts').insert({
+          'user_id': user.id, 'test_id': widget.test['id'], 'started_at': startedAt.toIso8601String(),
+          'submitted_at': submittedAt.toIso8601String(), 'total_questions': questions.length,
           'attempted': attempted, 'correct': correct, 'wrong': wrong, 'unattempted': questions.length - attempted,
           'score': correct, 'percentage': questions.isEmpty ? 0 : correct * 100 / questions.length, 'status': 'submitted'
-        });
+        }).select('id').single();
+        final attemptId = attempt['id'];
+        final answerRows = questions.map((q) {
+          final selected = answers[q['id']];
+          return {
+            'attempt_id': attemptId,
+            'question_id': q['id'],
+            'selected_option': selected,
+            'marked_for_review': false,
+            'is_correct': selected == null ? null : selected == q['correct_option'],
+            'answered_at': selected == null ? null : submittedAt.toIso8601String(),
+          };
+        }).toList();
+        if (answerRows.isNotEmpty) {
+          await db.from('attempt_answers').insert(answerRows);
+        }
       } catch (_) { /* Keep the result visible even if result-saving policies need configuration. */ }
     }
   }
