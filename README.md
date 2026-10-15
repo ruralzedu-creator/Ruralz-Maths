@@ -22,3 +22,7 @@ A security audit found that the `handle_new_user()` trigger function was directl
 The GitHub Actions workflow at `.github/workflows/build.yml` runs Flutter dependency installation, static analysis, a release APK build, and a web build. It uploads the APK and a ZIP of the web build as workflow artifacts.
 
 **Distribution status:** Development build only until the workflow passes and sign-up, sign-in, test submission, and result persistence are manually verified on Android and Web. The current source does not yet provide PDF export or a result-history screen.
+
+
+## Build verification
+A push to `main` starts the Android and Web build workflow. Open the Actions page to see the latest run and download artifacts after a successful build: https://github.com/ruralzedu-creator/Ruralz-Maths/actions
