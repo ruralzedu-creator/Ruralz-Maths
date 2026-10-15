@@ -18,6 +18,8 @@ jobs:
       - run: flutter analyze --no-fatal-infos
       - run: flutter build apk --release
       - run: flutter build web --release
+      - name: Package web app
+        run: cd build && zip -r ruralz-maths-web.zip web
       - uses: actions/upload-artifact@v4
         with:
           name: ruralz-maths-apk
@@ -25,4 +27,4 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: ruralz-maths-web
-          path: build/web/**
+          path: build/ruralz-maths-web.zip
